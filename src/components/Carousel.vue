@@ -1,8 +1,19 @@
 <script>
 export default {
+  name: "Carousel",
   props: {
     dotsVisible: {
       type: Boolean,
+      required: false,
+    },
+    automatic: {
+      type: Boolean,
+      required: false,
+    },
+    timer: {
+      type: Number,
+      required: false,
+      default: () => 3000,
     },
   },
   data() {
@@ -44,9 +55,11 @@ export default {
       this.slideDirection = "slide-left";
     },
     setInterval() {
-      this.interval = setInterval(() => this.ramdomSlide(), 5000);
+      if (this.automatic) {
+        this.interval = setInterval(() => this.sequenceSlide(), this.timer);
+      }
     },
-    ramdomSlide() {
+    sequenceSlide() {
       if (this.index < this.slides.length - 1) this.index++;
       else this.index = 0;
       this.$emit("change", this.index);
@@ -56,8 +69,6 @@ export default {
         this.next();
       } else if (event.keyCode === 37) {
         this.prev();
-      } else {
-        return;
       }
     },
     cliqueInDot(index) {
@@ -71,7 +82,7 @@ export default {
 </script>
 
 <template>
-  <div class="shr-carousel" @keydown="checkSlide($event)" tabindex="0">
+  <div class="shr-carousel" tabindex="0" @keydown="checkSlide($event)">
     <slot></slot>
     <div v-if="dotsVisible" class="shr-carousel__dots">
       <span
@@ -88,18 +99,21 @@ export default {
 <style lang="scss" scoped>
 .shr-carousel {
   display: flex;
+  justify-content: center;
   flex-direction: column;
   outline: none;
+  width: 500px;
   &__dots {
     display: flex;
     justify-content: center;
     padding-top: 10px;
 
     &__dot {
-      cursor: pointer;
-      height: 10px;
       width: 10px;
-      background-color: #e0e0e0;
+      height: 10px;
+      cursor: pointer;
+      background-color: blueviolet;
+      opacity: 0.6;
       border-radius: 100%;
       transition: all 0.2s ease;
       &:not(:last-of-type) {
@@ -110,8 +124,9 @@ export default {
         transform: scale(1.1);
       }
       &--active {
+        background-color: blanchedalmond;
+        opacity: 1;
         transform: scale(1.2);
-        background-color: blue;
       }
     }
   }
